@@ -17,7 +17,6 @@ const omdb = new (require('omdbapi'))('<your api key>');
     
 # Example usage
 
-
 omdb.search({
     search: 'game of thrones',  // required
     type: 'series',             // optionnal  ['series', 'episode', 'movie']
