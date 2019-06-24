@@ -1,40 +1,29 @@
-# OMDb
-Program to search for a name of movie over networks
+Open Movie Database Api Wrapper
+===============================
 
-# omdbapi
+A simple js wrapper for the omdb api (The Open Movie Database)
 
- Omdbapi wrapper, written in NodeJS
+## Install 
 
-# Usage
+```
+npm install omdbapiwrapper
+```
 
-# Setup
+## Example
 
-npm install omdbapi
+### Promise
+```js
+var omdb = require('omdbapi');
+omdb.search('pulp fiction')
+	.then(function(result){
+		console.log(results);
+	})
+```
 
-# Initialize
-
-const omdb = new (require('omdbapi'))('<your api key>');
-    
-# Example usage
-
-omdb.search({
-    search: 'game of thrones',  // required
-    type: 'series',             // optionnal  ['series', 'episode', 'movie']
-    year: '2011',               // optionnal
-    page: '1'                   // optionnal (1 to 100)
-}).then(res => {
-    console.log('got response:', res);
-}).catch(console.error);
-
-omdb.get({
-    id: 'tt0944947',            // optionnal (requires imdbid or title)
-    title: 'Game of Thrones',   // optionnal (requires imdbid or title)
-    season: 1,                  // optionnal
-    episode: 1,                 // optionnal
-    type: 'series',             // optionnal ['series', 'episode', 'movie']
-    plot: 'full',               // optionnal (defaults to 'short')
-    tomatoes: true,             // optionnal (get rotten tomatoes ratings)
-    year: '2011'                // optionnal
-}).then(res => {
-    console.log('got response:', res);
-}).catch(console.error);
+### callbacks
+```js
+var omdb = require('omdbapi');
+omdb.search('pulp fiction', function(results) {
+	console.log(results);
+})
+```
