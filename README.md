@@ -1,29 +1,43 @@
-Open Movie Database Api Wrapper
-===============================
+# omdbapiexam
 
-A simple js wrapper for the omdb api (The Open Movie Database)
+A small docker image that allows you to query OMDB using their API.
 
-## Install 
+**Note**:  You are required to obtain your own personal API key.
 
-```
-npm install omdbapiwrapper
-```
+<http://omdbapi.com/apikey.aspx>
 
-## Example
+## Build
 
-### Promise
-```js
-var omdb = require('omdbapi');
-omdb.search('pulp fiction')
-	.then(function(result){
-		console.log(results);
-	})
-```
+docker build -t <image:tag> .
 
-### callbacks
-```js
-var omdb = require('omdbapi');
-omdb.search('pulp fiction', function(results) {
-	console.log(results);
-})
-```
+Optionally you can pass your OMDB API Key into the build of the docker image via
+
+docker build --build-arg OMDB_API_KEY=\<value\> -t
+
+Optionally you can use GNUMake
+
+make IMAGE=\<image:tag>
+
+## Run
+
+docker run \<image:tag> will print usage
+
+Please provide a movie title
+
+**Usage:**
+
+* docker run -e OMDB_API_KEY=\<key> \<image:tag> \<movie title>
+
+Optionally you can pass your OMDB API Key into docker build, but is not secure
+
+* docker build --build-arg OMDB_API_KEY=\<key> -t \<image:tag> .
+* docker run \<image:tag> \<movie title>
+
+**Note**:  To debug OMDB lookup you can pass the argument DEBUG=true to run
+
+docker run -e OMDB_API_KEY=\<value> -e DEBUG=true \<image:tag> \<title>
+
+**Examples**:
+
+* docker run -e OMDB_API_KEY=\<value> omdbapi:v1 real genius
+* docker run -e OMDB_API_KEY=\<value> -e DEBUG=true omdbapi:v1  real
