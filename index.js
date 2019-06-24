@@ -1,9 +1,6 @@
 var fetch = require('node-fetch');
 
 
-
-
-
 function makeRequest(url) {
 
   return fetch(url)
@@ -11,7 +8,6 @@ function makeRequest(url) {
     .then(function(data){return data.json(); });
 
 }
-
 
 
 module.exports = {
