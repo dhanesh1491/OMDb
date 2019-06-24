@@ -3,7 +3,7 @@ Program to search for a name of movie over networks
 
 # omdbapi
 
-# Omdbapi wrapper, written in NodeJS
+ Omdbapi wrapper, written in NodeJS
 
 # Usage
 
