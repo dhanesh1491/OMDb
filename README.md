@@ -1,13 +1,21 @@
 # OMDb
 Program to search for a name of movie over networks
-omdbapi
-Omdbapi wrapper, written in NodeJS
-Usage
-Setup
+
+# omdbapi
+
+# Omdbapi wrapper, written in NodeJS
+
+# Usage
+
+# Setup
+
 npm install omdbapi
-Initialize
+
+# Initialize
+
 const omdb = new (require('omdbapi'))('<your api key>');
-Example usage
+    
+# Example usage
 omdb.search({
     search: 'game of thrones',  // required
     type: 'series',             // optionnal  ['series', 'episode', 'movie']
