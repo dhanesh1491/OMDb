@@ -1,0 +1,75 @@
+#!/bin/ash
+
+function printUsage() {
+  echo "Usage:"
+  echo "docker run -e OMDB_API_KEY=<key> <image:tag> <movie title>"
+  echo ""
+  echo "Optionally you can pass your OMDB API Key into docker build, but is not secure"
+  echo "docker build --build-arg OMDB_API_KEY=<key> -t <image:tag> ."
+  echo "docker run <image:tag> <movie title>"
+}
+
+if [[ "$DEBUG" == "true" ]]; then
+  set -x
+fi
+
+TITLE="$@"
+
+# Lets perform some initial checks
+if [[ -z "$TITLE" ]]; then
+   echo "Please provide a movie title"
+   echo ""
+   printUsage
+   exit 1
+fi
+
+if [[ "$OMDB_API_KEY" == "unset" ]]; then
+  echo "OMDB API Key was not provided"
+  echo ""
+  printUsage
+  exit 1
+fi
+
+# Helper function to perform a search if match doesn't work
+function doTitleSearch() {
+   MOVIE_SEARCH_RESULT=$(curl "http://www.omdbapi.com?apikey=$OMDB_API_KEY&s=$MOVIE" 2>/dev/null)
+   OMDB_SEARCH_RESPONSE=$(echo $MOVIE_SEARCH_RESULT | jq -r '.Response')
+   if [[ -z "$MOVIE_SEARCH_RESULT" || "$OMDB_SEARCH_RESPONSE" == "False" ]]; then
+      echo "Were unable to find your movie and also were unable to locate any movies that had similar names"
+      exit 1
+   fi
+   TOTAL_SEARCH_MATCH=$(echo $MOVIE_SEARCH_RESULT | jq -r '.totalResults')
+   echo "We were unable to locate an exact match, but there are $TOTAL_SEARCH_MATCH movies that search was able to locate, here are a few"
+   echo $MOVIE_SEARCH_RESULT | jq '.Search[] | .Title'
+}
+
+# Do the initial lookup
+MOVIE=$(echo $TITLE | sed 's/ /+/g')
+MOVIE_RESULT=$(curl "http://www.omdbapi.com?apikey=$OMDB_API_KEY&t=$MOVIE" 2>/dev/null)
+OMDB_RESPONSE=$(echo $MOVIE_RESULT | jq -r '.Response')
+if [[ -z "$MOVIE_RESULT" || "$OMDB_RESPONSE" == "False" ]]; then
+  doTitleSearch
+  exit 1
+fi
+
+# OMDB can return a close match if no exact match is available, so lets check that
+MOVIE_TITLE=$(echo "$MOVIE_RESULT" | jq -r '.Title')
+LOWER_TITLE=$(echo "$MOVIE_TITLE" | tr '[:upper:]' '[:lower:]')
+LOWER_ENTERED=$(echo -n "$TITLE" | tr '[:upper:]' '[:lower:]')
+
+if [[ "$LOWER_TITLE" != "$LOWER_ENTERED" ]]; then
+   doTitleSearch
+   exit 1
+fi
+
+# We had an exact match, so lets check for ratings
+export RATING=$(echo "$MOVIE_RESULT" |  jq -r '.Ratings[] | select(.Source == "Rotten Tomatoes") | .Value')
+if [[ -z "$RATING" ]]; then
+  echo "Rotten Tomatoes ratings for $TITLE were not available"
+  echo "Other ratings available are:"
+  echo "$MOVE_RESULT" | jq -r '.Ratings[] | "\(.Source) \(.Value)"'
+  exit 1
+fi
+
+echo "Rotten Tomatoes has a rating of $RATING for $MOVIE_TITLE"
+exit 0
